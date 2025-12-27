@@ -16,10 +16,10 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('appointments.urls')),
-    path('api/', include('internships.urls')),
-    path('api/', include('projects.urls')),
-    path('api/', include('contacts.urls')),
+    path('api/appointments/', include('appointments.urls')),
+    path('api/internships/', include('internships.urls')),
+    path('api/projects/', include('projects.urls')),
+    path('api/contacts/', include('contacts.urls')),
 
     # Swagger
     path('swagger.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),
