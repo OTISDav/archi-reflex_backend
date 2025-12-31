@@ -8,12 +8,10 @@ class ProjectAdmin(admin.ModelAdmin):
         'title',
         'year',
         'created_at',
-        'is_published',
     )
 
     list_filter = (
         'year',
-        'is_published',
     )
 
     search_fields = (
@@ -32,11 +30,6 @@ class ProjectAdmin(admin.ModelAdmin):
                 'description',
                 'year',
                 'image',
-            )
-        }),
-        ('Publication', {
-            'fields': (
-                'is_published',
             )
         }),
         ('Dates', {
