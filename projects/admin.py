@@ -6,11 +6,13 @@ from .models import Project
 class ProjectAdmin(admin.ModelAdmin):
     list_display = (
         'title',
+        'project_type',
         'year',
         'created_at',
     )
 
     list_filter = (
+        'project_type',
         'year',
     )
 
@@ -21,18 +23,19 @@ class ProjectAdmin(admin.ModelAdmin):
 
     ordering = ('-year',)
 
-    readonly_fields = ('created_at',)  # ✅ updated_at supprimé
+    readonly_fields = ('created_at',)
 
     fieldsets = (
         ('Informations du projet', {
             'fields': (
                 'title',
                 'description',
+                'project_type',
                 'year',
                 'image',
             )
         }),
-        ('Dates', {
+        ('Date de création', {
             'fields': (
                 'created_at',
             )
