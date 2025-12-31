@@ -27,7 +27,12 @@ SECRET_KEY = "django-insecure-#3dl(x&0e^=56o#g3%i95l7da^p6=ig7mi%rev4s+ea%ztt^(b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "archi-reflex-backend.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
+
 
 
 # Application definition
