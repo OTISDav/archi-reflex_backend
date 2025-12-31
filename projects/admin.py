@@ -21,7 +21,7 @@ class ProjectAdmin(admin.ModelAdmin):
 
     ordering = ('-year',)
 
-    readonly_fields = ('created_at', 'updated_at')
+    readonly_fields = ('created_at',)  # ✅ updated_at supprimé
 
     fieldsets = (
         ('Informations du projet', {
@@ -35,7 +35,6 @@ class ProjectAdmin(admin.ModelAdmin):
         ('Dates', {
             'fields': (
                 'created_at',
-                'updated_at',
             )
         }),
     )
