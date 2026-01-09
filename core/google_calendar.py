@@ -6,8 +6,9 @@ def create_calendar_event(appointment):
     """
     Crée un événement Google Calendar pour un rendez-vous
     """
+    # Utiliser le fichier secret sur Render
     credentials = service_account.Credentials.from_service_account_file(
-        settings.GOOGLE_CREDENTIALS_FILE,
+        "/etc/secrets/service_account.json",
         scopes=['https://www.googleapis.com/auth/calendar']
     )
 
