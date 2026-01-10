@@ -2,10 +2,29 @@ from rest_framework import serializers
 from .models import Internship
 
 class InternshipSerializer(serializers.ModelSerializer):
+    cv = serializers.SerializerMethodField()
+    letter = serializers.SerializerMethodField()
+
     class Meta:
         model = Internship
         fields = '__all__'
         read_only_fields = ('status', 'created_at')
+
+    def get_cv(self, obj):
+        if obj.cv:
+            # si c'est déjà une string (upload via perform_create), on renvoie tel quel
+            if isinstance(obj.cv, str):
+                return obj.cv
+            # sinon CloudinaryField
+            return obj.cv.url
+        return None
+
+    def get_letter(self, obj):
+        if obj.letter:
+            if isinstance(obj.letter, str):
+                return obj.letter
+            return obj.letter.url
+        return None
 
     def validate_cv(self, file):
         if not file.name.endswith('.pdf'):

@@ -1,4 +1,5 @@
 from django.db import models
+from cloudinary.models import CloudinaryField
 
 class Internship(models.Model):
     STATUS_CHOICES = [
@@ -12,7 +13,10 @@ class Internship(models.Model):
     phone = models.CharField(max_length=20)
     school = models.CharField(max_length=100)
     message = models.TextField()
-    cv = models.FileField(upload_to='internships/cv/')
-    letter = models.FileField(upload_to='internships/letters/')
+    cv = CloudinaryField('cv', resource_type='raw')
+    letter = CloudinaryField('letter', resource_type='raw')  
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.school}"
