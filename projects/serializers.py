@@ -11,6 +11,6 @@ class ProjectSerializer(serializers.ModelSerializer):
     def get_image(self, obj):
         if obj.image:
             if isinstance(obj.image, str):
-                return obj.image  # si c'est déjà une URL (upload Cloudinary)
-            return obj.image.url  # sinon CloudinaryField
+                return obj.image
+            return obj.image.url
         return None

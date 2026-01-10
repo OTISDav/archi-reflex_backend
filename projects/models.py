@@ -6,7 +6,7 @@ class Project(models.Model):
     description = models.TextField()
     project_type = models.CharField(max_length=100)
     year = models.IntegerField()
-    image = CloudinaryField('image', resource_type='image')  # <-- Cloudinary
+    image = CloudinaryField('image', resource_type='image')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
