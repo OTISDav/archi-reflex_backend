@@ -35,22 +35,23 @@ class ProjectAdminAPIView(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAdminUser]
     parser_classes = (MultiPartParser, FormParser)  # pour recevoir les fichiers
 
-    def perform_create(self, serializer):
-        image = self.request.FILES.get("image")  # clé envoyée depuis frontend
 
+    def perform_create(self, serializer):
+        image = self.request.FILES.get("image")
         if not image:
             raise ValidationError({"image": "Aucune image reçue."})
 
-        # Générer un nom unique pour l'image
-        filename_base = f"{self.request.user.id}_{int(time.time())}"
-        public_id = f"projects/{filename_base}"
+        # Générer un public_id unique
+        public_id = f"projects/{self.request.user.id}_{int(time.time())}"
 
         # Upload sur Cloudinary
         result = upload(image, resource_type="image", public_id=public_id, access_mode="public")
-        file_url = result.get("secure_url")
+
+        file_url = result.get("secure_url")  # <-- C'EST CE QU'IL FAUT UTILISER
 
         if not file_url:
             raise ValidationError({"image": "Échec de l'envoi sur Cloudinary."})
 
-        # Sauvegarde de l'objet Project avec l'URL Cloudinary
+        # Sauvegarde de l'objet Project avec l'URL
         serializer.save(image=file_url)
+
