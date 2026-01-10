@@ -7,3 +7,6 @@ class Project(models.Model):
     year = models.IntegerField()
     image = models.ImageField(upload_to='projects/')
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
