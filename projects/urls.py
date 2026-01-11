@@ -3,10 +3,10 @@ from .views import ProjectAdminAPIView, ProjectListAPIView
 from django.urls import path
 
 router = DefaultRouter()
-router.register(r'admin', ProjectAdminAPIView, basename='project-admin')
+router.register(r'projects/admin', ProjectAdminAPIView, basename='project-admin')
 
 urlpatterns = [
-    path('projects/', ProjectListAPIView.as_view()),  # public
+    path('projects/', ProjectListAPIView.as_view()),
 ]
 
 urlpatterns += router.urls
