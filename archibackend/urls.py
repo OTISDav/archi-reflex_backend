@@ -3,6 +3,10 @@ from django.urls import path, include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -20,6 +24,11 @@ urlpatterns = [
     path('api/internships/', include('internships.urls')),
     path('api/projects/', include('projects.urls')),
     path('api/contacts/', include('contacts.urls')),
+
+    #admin
+
+    path('api/auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # Swagger
     path('swagger.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),

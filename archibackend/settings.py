@@ -52,6 +52,8 @@ INSTALLED_APPS = [
 
     'rest_framework',
 
+
+
     'appointments',
     'internships',
     'projects',
@@ -148,6 +150,11 @@ DATABASES = {
     )
 }
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
