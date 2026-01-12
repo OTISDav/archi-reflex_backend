@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import Appointment
 
-
+# --- Actions admin pour changer le status ---
 @admin.action(description="Marquer comme confirmé")
 def mark_confirmed(modeladmin, request, queryset):
     queryset.update(status=Appointment.Status.CONFIRMED)
@@ -17,6 +17,7 @@ def mark_pending(modeladmin, request, queryset):
     queryset.update(status=Appointment.Status.PENDING)
 
 
+# --- Admin class ---
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
     list_display = (
@@ -28,33 +29,21 @@ class AppointmentAdmin(admin.ModelAdmin):
         "date",
         "created_at",
     )
-
     list_filter = (
         "status",
         "project_type",
         "date",
         "created_at",
     )
-
     search_fields = (
         "name",
         "email",
         "phone",
         "project_type",
     )
-
     ordering = ("-created_at",)
-
-    readonly_fields = (
-        "google_event_id",
-        "created_at",
-    )
-
-    actions = (
-        mark_confirmed,
-        mark_cancelled,
-        mark_pending,
-    )
+    readonly_fields = ("google_event_id", "created_at")
+    actions = [mark_confirmed, mark_cancelled, mark_pending]
 
     fieldsets = (
         ("Client", {

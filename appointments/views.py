@@ -1,6 +1,5 @@
 from rest_framework.views import APIView
 from django.conf import settings
-from .models import Appointment
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from .models import Appointment
@@ -53,6 +52,35 @@ class AppointmentCreateAPIView(APIView):
 
 
 
+# class AppointmentAdminAPIView(generics.GenericAPIView):
+#     """
+#     Admin : lister tous les RDV et modifier leur statut
+#     """
+#     queryset = Appointment.objects.all()
+#     serializer_class = AppointmentSerializer
+#     permission_classes = [permissions.IsAdminUser]
+#
+#     def get(self, request):
+#         appointments = self.get_queryset()
+#         serializer = self.get_serializer(appointments, many=True)
+#         return Response(serializer.data)
+#
+#     def patch(self, request, pk):
+#         appointment = self.get_object()
+#         serializer = self.get_serializer(
+#             appointment,
+#             data=request.data,
+#             partial=True
+#         )
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+
+
+
 class AppointmentAdminAPIView(generics.GenericAPIView):
     """
     Admin : lister tous les RDV et modifier leur statut
@@ -60,14 +88,24 @@ class AppointmentAdminAPIView(generics.GenericAPIView):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
     permission_classes = [permissions.IsAdminUser]
+    lookup_field = "pk"
 
-    def get(self, request):
-        appointments = self.get_queryset()
-        serializer = self.get_serializer(appointments, many=True)
+    def get(self, request, pk=None):
+        if pk is not None:
+            # Détail d'un RDV
+            appointment = self.get_object()
+            serializer = self.get_serializer(appointment)
+        else:
+            # Liste de tous les RDV
+            appointments = self.get_queryset()
+            serializer = self.get_serializer(appointments, many=True)
+
         return Response(serializer.data)
 
     def patch(self, request, pk):
         appointment = self.get_object()
+        old_status = appointment.status  # on garde l'ancien status
+
         serializer = self.get_serializer(
             appointment,
             data=request.data,
@@ -75,5 +113,24 @@ class AppointmentAdminAPIView(generics.GenericAPIView):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
+        # 🔔 Envoi email si le status change
+        new_status = serializer.instance.status
+        if old_status != new_status:
+            try:
+                if new_status == "confirmed":
+                    send_notification(
+                        "Votre rendez-vous est confirmé",
+                        f"Bonjour {appointment.name},\nVotre RDV pour '{appointment.project_type}' a été confirmé.",
+                        appointment.email
+                    )
+                elif new_status == "cancelled":
+                    send_notification(
+                        "Votre rendez-vous est annulé",
+                        f"Bonjour {appointment.name},\nVotre RDV pour '{appointment.project_type}' a été annulé.",
+                        appointment.email
+                    )
+            except Exception as e:
+                print(f"Erreur envoi email notification status: {e}")
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
