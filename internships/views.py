@@ -1,12 +1,13 @@
 from rest_framework.views import APIView
 from django.conf import settings
-from rest_framework import status, permissions
-from rest_framework.response import Response
-from .models import Internship
-from .serializers import InternshipSerializer
+from rest_framework import status
 from cloudinary.uploader import upload
 from rest_framework import generics, permissions
-from django.core.exceptions import ValidationError
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from .models import Internship
+from .serializers import InternshipSerializer
+
 import time
 
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 Mo max par fichier
@@ -60,19 +61,45 @@ class InternshipCreateAPIView(APIView):
 
 
 
+# class InternshipAdminAPIView(generics.GenericAPIView):
+#     """Admin : voir et gérer toutes les demandes de stage"""
+#     queryset = Internship.objects.all().order_by('-created_at')
+#     serializer_class = InternshipSerializer
+#     permission_classes = [permissions.IsAdminUser]
+#
+#     def get(self, request):
+#         internships = self.get_queryset()
+#         serializer = self.get_serializer(internships, many=True)
+#         return Response(serializer.data, status=200)
+#
+#     def patch(self, request, pk):
+#         internship = self.get_object()
+#         serializer = self.get_serializer(
+#             internship,
+#             data=request.data,
+#             partial=True
+#         )
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response(serializer.data, status=200)
+
+
+
+
 class InternshipAdminAPIView(generics.GenericAPIView):
-    """Admin : voir et gérer toutes les demandes de stage"""
-    queryset = Internship.objects.all().order_by('-created_at')
+    """ADMIN : lister et modifier les demandes de stage"""
+
+    queryset = Internship.objects.all().order_by("-created_at")
     serializer_class = InternshipSerializer
     permission_classes = [permissions.IsAdminUser]
 
     def get(self, request):
         internships = self.get_queryset()
         serializer = self.get_serializer(internships, many=True)
-        return Response(serializer.data, status=200)
+        return Response(serializer.data)
 
     def patch(self, request, pk):
-        internship = self.get_object()
+        internship = get_object_or_404(Internship, pk=pk)
         serializer = self.get_serializer(
             internship,
             data=request.data,
@@ -80,4 +107,4 @@ class InternshipAdminAPIView(generics.GenericAPIView):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=200)
+        return Response(serializer.data)
