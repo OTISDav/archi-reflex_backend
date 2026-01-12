@@ -15,7 +15,6 @@ MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 Mo max par fichier
 from core.emails import send_notification
 
 class InternshipCreateAPIView(APIView):
-    """Soumettre une demande de stage avec upload Cloudinary"""
     def post(self, request):
         cv = request.FILES.get("cv")
         letter = request.FILES.get("letter")
@@ -61,33 +60,9 @@ class InternshipCreateAPIView(APIView):
 
 
 
-# class InternshipAdminAPIView(generics.GenericAPIView):
-#     """Admin : voir et gérer toutes les demandes de stage"""
-#     queryset = Internship.objects.all().order_by('-created_at')
-#     serializer_class = InternshipSerializer
-#     permission_classes = [permissions.IsAdminUser]
-#
-#     def get(self, request):
-#         internships = self.get_queryset()
-#         serializer = self.get_serializer(internships, many=True)
-#         return Response(serializer.data, status=200)
-#
-#     def patch(self, request, pk):
-#         internship = self.get_object()
-#         serializer = self.get_serializer(
-#             internship,
-#             data=request.data,
-#             partial=True
-#         )
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response(serializer.data, status=200)
-
-
 
 
 class InternshipAdminAPIView(generics.GenericAPIView):
-    """ADMIN : lister et modifier les demandes de stage"""
 
     queryset = Internship.objects.all().order_by("-created_at")
     serializer_class = InternshipSerializer

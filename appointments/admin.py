@@ -1,7 +1,6 @@
 from django.contrib import admin
 from .models import Appointment
 
-# --- Actions admin pour changer le status ---
 @admin.action(description="Marquer comme confirmé")
 def mark_confirmed(modeladmin, request, queryset):
     queryset.update(status=Appointment.Status.CONFIRMED)
@@ -17,7 +16,6 @@ def mark_pending(modeladmin, request, queryset):
     queryset.update(status=Appointment.Status.PENDING)
 
 
-# --- Admin class ---
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
     list_display = (

@@ -8,9 +8,7 @@ from core.google_calendar import create_calendar_event
 from core.emails import send_notification
 
 
-# --- PUBLIC ---
 class AppointmentCreateAPIView(APIView):
-    """Permet au public de créer un rendez-vous"""
 
     def post(self, request):
         serializer = AppointmentSerializer(data=request.data)
@@ -48,43 +46,8 @@ class AppointmentCreateAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# --- ADMIN ---
-
-
-
-# class AppointmentAdminAPIView(generics.GenericAPIView):
-#     """
-#     Admin : lister tous les RDV et modifier leur statut
-#     """
-#     queryset = Appointment.objects.all()
-#     serializer_class = AppointmentSerializer
-#     permission_classes = [permissions.IsAdminUser]
-#
-#     def get(self, request):
-#         appointments = self.get_queryset()
-#         serializer = self.get_serializer(appointments, many=True)
-#         return Response(serializer.data)
-#
-#     def patch(self, request, pk):
-#         appointment = self.get_object()
-#         serializer = self.get_serializer(
-#             appointment,
-#             data=request.data,
-#             partial=True
-#         )
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-
-
-
-
 class AppointmentAdminAPIView(generics.GenericAPIView):
-    """
-    Admin : lister tous les RDV et modifier leur statut
-    """
+
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
     permission_classes = [permissions.IsAdminUser]
