@@ -4,6 +4,8 @@ from rest_framework import generics, permissions
 from django.conf import settings
 from .serializers import ContactSerializer
 from .models import ContactMessage
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from core.emails import send_notification
 
 # --- PUBLIC ---
@@ -26,3 +28,9 @@ class ContactAdminAPIView(generics.ListAPIView):
     serializer_class = ContactSerializer
     permission_classes = [permissions.IsAdminUser]
 
+
+
+
+@csrf_exempt
+def health_check(view):
+    return JsonResponse({"status": "ok"})
