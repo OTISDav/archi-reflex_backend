@@ -5,12 +5,7 @@ DEFAULT_SENDER = {"name": "David Botcholi", "email": "david.botcholi@davidbotcho
 ADMIN_EMAIL = 'ddavidotis@gmail.com'
 
 def send_notification(subject, message, recipient):
-    """
-    Envoie un email via l'API Brevo.
-    subject: sujet de l'email
-    message: contenu HTML de l'email
-    recipient: email du destinataire
-    """
+
     BREVO_API_KEY = os.environ.get('BREVO_API_KEY')
 
     if not BREVO_API_KEY:
@@ -42,6 +37,3 @@ def send_notification(subject, message, recipient):
         print(f"❌ Exception envoi email à {recipient}: {e}")
         return {"error": str(e)}
 
-import os
-
-print("Clé API Brevo:", os.environ.get('BREVO_API_KEY'))
