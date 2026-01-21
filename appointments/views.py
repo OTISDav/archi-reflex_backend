@@ -15,42 +15,32 @@ from core.emails import send_notification
 class AppointmentCreateAPIView(APIView):
 
     def post(self, request):
-        serializer = AppointmentSerializer(data=request.data)
-
-        if serializer.is_valid():
-            # Création du RDV avec statut pending
-            appointment = serializer.save(status="pending")
-
-            # 📧 Notification admin uniquement
-            try:
-                send_notification(
-                    subject="Nouvelle demande de rendez-vous",
-                    message=(
-                        f"Nouveau rendez-vous demandé\n\n"
-                        f"Nom : {appointment.name}\n"
-                        f"Email : {appointment.email}\n"
-                        f"Téléphone : {appointment.phone}\n"
-                        f"Projet : {appointment.project_type}\n"
-                        f"Date : {appointment.date} à {appointment.time}"
-                    ),
-                    recipient=settings.ADMIN_EMAIL
-                )
-            except Exception as e:
-                print(f"Erreur email admin: {e}")
-
-            return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED
-            )
-
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
+        serializer = AppointmentSerializer(
+            data=request.data,
+            context={"request": request}
         )
+        serializer.is_valid(raise_exception=True)
+
+        appointment = serializer.save(status="pending")
+
+        send_notification(
+            subject="Nouvelle demande de rendez-vous",
+            message=(
+                f"Nouveau rendez-vous demandé\n\n"
+                f"Nom : {appointment.name}\n"
+                f"Email : {appointment.email}\n"
+                f"Téléphone : {appointment.phone}\n"
+                f"Projet : {appointment.project_type}\n"
+                f"Date : {appointment.date} à {appointment.time}"
+            ),
+            recipient=settings.ADMIN_EMAIL
+        )
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 # ==========================
-# 🔹 Admin RDV (Liste / Détail / Confirmation)
+# 🔹 Admin RDV
 # ==========================
 class AppointmentAdminAPIView(generics.GenericAPIView):
 
@@ -59,78 +49,71 @@ class AppointmentAdminAPIView(generics.GenericAPIView):
     permission_classes = [permissions.IsAdminUser]
     lookup_field = "pk"
 
-    # 📄 Liste ou détail
-    def get(self, request, pk=None):
-        if pk:
-            appointment = self.get_object()
-            serializer = self.get_serializer(appointment)
-        else:
-            appointments = self.get_queryset()
-            serializer = self.get_serializer(appointments, many=True)
-
-        return Response(serializer.data)
-
-
-    # ✏️ Mise à jour (confirmation / annulation)
     def patch(self, request, pk):
         appointment = self.get_object()
         old_status = appointment.status
+        new_status = request.data.get("status")
 
-        serializer = self.get_serializer(
-            appointment,
-            data=request.data,
-            partial=True
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        # 🔒 Sécurité transitions
+        if old_status == "confirmed" and new_status == "confirmed":
+            return Response(
+                {"detail": "Rendez-vous déjà confirmé."},
+                status=status.HTTP_409_CONFLICT
+            )
 
-        new_status = serializer.instance.status
+        if old_status == "cancelled":
+            return Response(
+                {"detail": "Impossible de modifier un rendez-vous annulé."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         # ==========================
-        # ✅ Confirmation du RDV
+        # ✅ CONFIRMATION
         # ==========================
-        if old_status != "confirmed" and new_status == "confirmed":
+        if old_status == "pending" and new_status == "confirmed":
 
-            # 📅 Création Google Calendar
-            try:
+            # 📅 Google Calendar (une seule fois)
+            if not appointment.google_event_id:
                 event_id = create_calendar_event(appointment)
                 appointment.google_event_id = event_id
-                appointment.save()
-            except Exception as e:
-                print(f"Erreur Google Calendar: {e}")
 
-            # 📧 Email client confirmation
-            try:
-                send_notification(
-                    subject="Votre rendez-vous est confirmé ✅",
-                    message=(
-                        f"Bonjour {appointment.name},\n\n"
-                        f"Votre rendez-vous pour le projet "
-                        f"\"{appointment.project_type}\" a été confirmé.\n\n"
-                        f"📅 Date : {appointment.date}\n"
-                        f"⏰ Heure : {appointment.time}\n\n"
-                        f"À très bientôt."
-                    ),
-                    recipient=appointment.email
-                )
-            except Exception as e:
-                print(f"Erreur email confirmation: {e}")
+            # 📧 Email client
+            send_notification(
+                subject="Votre rendez-vous est confirmé ✅",
+                message=(
+                    f"Bonjour {appointment.name},\n\n"
+                    f"Votre rendez-vous pour le projet "
+                    f"\"{appointment.project_type}\" est confirmé.\n\n"
+                    f"📅 Date : {appointment.date}\n"
+                    f"⏰ Heure : {appointment.time}\n\n"
+                    f"À très bientôt."
+                ),
+                recipient=appointment.email
+            )
+
+            appointment.status = "confirmed"
+            appointment.save()
 
         # ==========================
-        # ❌ Annulation du RDV
+        # ❌ ANNULATION
         # ==========================
-        elif old_status != "cancelled" and new_status == "cancelled":
-            try:
-                send_notification(
-                    subject="Rendez-vous annulé ❌",
-                    message=(
-                        f"Bonjour {appointment.name},\n\n"
-                        f"Votre rendez-vous pour le projet "
-                        f"\"{appointment.project_type}\" a été annulé."
-                    ),
-                    recipient=appointment.email
-                )
-            except Exception as e:
-                print(f"Erreur email annulation: {e}")
+        elif new_status == "cancelled":
+            appointment.status = "cancelled"
+            appointment.save()
+
+            send_notification(
+                subject="Rendez-vous annulé ❌",
+                message=(
+                    f"Bonjour {appointment.name},\n\n"
+                    f"Votre rendez-vous a été annulé."
+                ),
+                recipient=appointment.email
+            )
+
+        # Serializer uniquement pour la réponse
+        serializer = AppointmentSerializer(
+            appointment,
+            context={"request": request}
+        )
 
         return Response(serializer.data, status=status.HTTP_200_OK)
