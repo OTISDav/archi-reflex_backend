@@ -5,10 +5,17 @@ DEFAULT_SENDER = {"name": "David Botcholi", "email": "david.botcholi@gmail.com"}
 ADMIN_EMAIL = 'davidbotcholi2003@gmail.com'
 
 def send_notification(subject, message, recipient):
+    """
+    Envoie un email via l'API Brevo.
+    subject: sujet de l'email
+    message: contenu HTML de l'email
+    recipient: email du destinataire
+    """
     BREVO_API_KEY = os.environ.get('BREVO_API_KEY')
+
     if not BREVO_API_KEY:
-        print("⚠️ Clé API Brevo non trouvée ! Vérifie Render")
-        return
+        print("⚠️ Clé API Brevo introuvable ! Vérifie que la variable d'environnement est bien définie sur Render et que le service est redéployé.")
+        return {"error": "Clé API introuvable"}
 
     url = "https://api.brevo.com/v3/smtp/email"
     headers = {
@@ -23,7 +30,18 @@ def send_notification(subject, message, recipient):
         "htmlContent": message
     }
 
-    response = requests.post(url, json=data, headers=headers)
-    if response.status_code not in (200, 201):
-        print("Erreur envoi email:", response.text)
-    return response.json()
+    try:
+        response = requests.post(url, json=data, headers=headers, timeout=10)
+        if response.status_code not in (200, 201):
+            print(f"❌ Erreur envoi email à {recipient}: {response.text}")
+            return {"error": response.text, "status_code": response.status_code}
+        else:
+            print(f"✅ Email envoyé à {recipient}: {subject}")
+            return response.json()
+    except requests.RequestException as e:
+        print(f"❌ Exception envoi email à {recipient}: {e}")
+        return {"error": str(e)}
+
+import os
+
+print("Clé API Brevo:", os.environ.get('BREVO_API_KEY'))
