@@ -18,15 +18,14 @@ class AppointmentCreateAPIView(generics.CreateAPIView):
         # Email client
         send_notification(
             "Demande de rendez-vous reçue",
-            f"Bonjour {appointment.name},\nVotre demande est en attente de confirmation.",
-            "vous recevrer un mail apres confirmation ou refus",
+            f"Bonjour {appointment.name},\nVotre demande est en attente de confirmation. vous recevrer un mail apres confirmation ou refus",
             appointment.email
         )
 
         # Email admin
         send_notification(
             "Nouveau rendez-vous en attente",
-            f"{appointment.name} - {appointment.email} - {appointment.phone}",
+            f"{appointment.name} - {appointment.email} - {appointment.phone} - {appointment.date}",
             settings.ADMIN_EMAIL
         )
 
