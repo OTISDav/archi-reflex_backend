@@ -26,9 +26,7 @@ class AppointmentCreateAPIView(generics.CreateAPIView):
         # Email admin
         send_notification(
             "Nouveau rendez-vous en attente",
-            f"{appointment.name} - {appointment.email}",
-            f"{appointment.phone} - {appointment.project_type}",
-            f"{appointment.date} - {appointment.time}",
+            f"{appointment.name} - {appointment.email} - {appointment.phone} - {appointment.project_type} - {appointment.date} - {appointment}",
             settings.ADMIN_EMAIL
         )
 
