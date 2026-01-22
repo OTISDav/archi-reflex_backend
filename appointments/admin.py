@@ -3,12 +3,12 @@ from .models import Appointment
 
 @admin.action(description="Marquer comme confirmé")
 def mark_confirmed(modeladmin, request, queryset):
-    queryset.update(status=Appointment.Status.CONFIRMED)
+    queryset.update(status=Appointment.Status.accepted)
 
 
 @admin.action(description="Marquer comme annulé")
 def mark_cancelled(modeladmin, request, queryset):
-    queryset.update(status=Appointment.Status.CANCELLED)
+    queryset.update(status=Appointment.Status.rejected)
 
 
 @admin.action(description="Marquer comme en attente")
