@@ -1,5 +1,5 @@
 from celery import shared_task
-from appointments.models import Appointment
+from .models import Appointment
 from core.emails import send_notification
 from core.google_calendar import create_calendar_event
 

@@ -5,7 +5,8 @@ from rest_framework.response import Response
 
 from .models import Appointment
 from .serializers import AppointmentSerializer
-from core.tasks import send_email_task, create_calendar_event_task
+from core.google_calendar import create_calendar_event
+from core.emails import send_notification
 
 
 # =========================
@@ -16,19 +17,22 @@ class AppointmentCreateAPIView(APIView):
     def post(self, request):
         serializer = AppointmentSerializer(data=request.data)
         if serializer.is_valid():
-            # RDV créé en attente
+            # ⏳ RDV créé en attente
             appointment = serializer.save(status="pending")
 
-            # Email admin async
-            send_email_task.delay(
-                subject="Nouveau rendez-vous",
-                message=(
-                    f"Nouveau RDV avec {appointment.name}\n"
-                    f"Email : {appointment.email}\n"
-                    f"Téléphone : {appointment.phone}"
-                ),
-                recipient=settings.ADMIN_EMAIL
-            )
+            # 📧 Email ADMIN uniquement
+            try:
+                send_notification(
+                    subject="Nouveau rendez-vous",
+                    message=(
+                        f"Nouveau RDV avec {appointment.name}\n"
+                        f"Email : {appointment.email}\n"
+                        f"Téléphone : {appointment.phone}"
+                    ),
+                    recipient=settings.ADMIN_EMAIL
+                )
+            except Exception as e:
+                print(f"Erreur email admin: {e}")
 
             return Response(
                 AppointmentSerializer(appointment).data,
@@ -61,6 +65,7 @@ class AppointmentAdminAPIView(generics.GenericAPIView):
     def patch(self, request, pk):
         appointment = self.get_object()
         old_status = appointment.status
+
         serializer = self.get_serializer(
             appointment,
             data=request.data,
@@ -68,57 +73,49 @@ class AppointmentAdminAPIView(generics.GenericAPIView):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
         new_status = serializer.instance.status
 
         # =========================
-        # LOGIQUE MÉTIER ASYNC
+        # LOGIQUE MÉTIER
         # =========================
         if old_status != new_status:
             try:
-                # ── ACCEPTÉ
+                # ✅ ACCEPTÉ
                 if new_status == "accepted":
-                    # Bloquer si rejected auparavant
-                    if old_status == "rejected":
-                        return Response(
-                            {"detail": "Impossible d'accepter un RDV rejeté."},
-                            status=status.HTTP_400_BAD_REQUEST
-                        )
 
-                    # Google Calendar async
+                    # 📅 Google Calendar (une seule fois)
                     if not appointment.google_event_id:
-                        create_calendar_event_task.delay(appointment.id)
+                        event_id = create_calendar_event(appointment)
+                        appointment.google_event_id = event_id
+                        appointment.save()
 
-                    # Email confirmation client async
-                    send_email_task.delay(
+                    # 📧 Email confirmation client
+                    send_notification(
                         subject="Votre rendez-vous est confirmé",
                         message=(
                             f"Bonjour {appointment.name},\n\n"
-                            f"Votre RDV pour '{appointment.project_type}' a été confirmé."
+                            f"Votre RDV pour '{appointment.project_type}' "
+                            f"a été confirmé.\n\n"
+                            f"À très bientôt."
                         ),
                         recipient=appointment.email
                     )
 
-                # ── REJETÉ
+                # ❌ REJETÉ
                 elif new_status == "rejected":
-                    # Supprimer Google Calendar si existant
-                    if appointment.google_event_id:
-                        create_calendar_event_task.delay(
-                            appointment.id, delete=True
-                        )
-                        appointment.google_event_id = ""
-                        appointment.save()
-
-                    # Email rejet client async
-                    send_email_task.delay(
+                    send_notification(
                         subject="Votre rendez-vous a été annulé",
                         message=(
                             f"Bonjour {appointment.name},\n\n"
-                            f"Votre RDV pour '{appointment.project_type}' a été annulé."
+                            f"Votre RDV pour '{appointment.project_type}' "
+                            f"a été annulé.\n\n"
+                            f"Merci pour votre compréhension."
                         ),
                         recipient=appointment.email
                     )
 
             except Exception as e:
-                print(f"Erreur notification RDV async: {e}")
+                print(f"Erreur notification RDV: {e}")
 
         return Response(serializer.data, status=status.HTTP_200_OK)
