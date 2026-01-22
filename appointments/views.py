@@ -33,27 +33,17 @@ class AppointmentCreateAPIView(generics.CreateAPIView):
 
 
 class AppointmentAdminAPIView(generics.ListAPIView, generics.UpdateAPIView):
-    """
-    API admin : liste + accepter / refuser un rendez-vous
-    """
     queryset = Appointment.objects.all()
     serializer_class = AdminAppointmentSerializer
     permission_classes = [permissions.IsAdminUser]
     lookup_field = "pk"
 
     def perform_update(self, serializer):
-        appointment = self.get_object()
-        old_status = appointment.status
+        appointment = serializer.save()  # 🔹 Save met à jour directement
+
         new_status = serializer.validated_data.get("status")
 
-        # Sécurité : pas de changement inutile
-        if old_status == new_status:
-            return
-
-        serializer.save()
-
         if new_status == "accepted":
-            # Google Calendar
             try:
                 event_id = create_calendar_event(appointment)
                 appointment.google_event_id = event_id
@@ -61,7 +51,6 @@ class AppointmentAdminAPIView(generics.ListAPIView, generics.UpdateAPIView):
             except Exception as e:
                 print(f"Erreur Google Calendar : {e}")
 
-            # Email client
             send_notification(
                 "Rendez-vous confirmé",
                 f"Bonjour {appointment.name},\nVotre rendez-vous est confirmé.",
@@ -69,7 +58,6 @@ class AppointmentAdminAPIView(generics.ListAPIView, generics.UpdateAPIView):
             )
 
         elif new_status == "rejected":
-            # Email client
             send_notification(
                 "Rendez-vous refusé",
                 f"Bonjour {appointment.name},\nVotre rendez-vous a été refusé.",
