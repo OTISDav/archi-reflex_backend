@@ -18,7 +18,7 @@ class AppointmentCreateAPIView(generics.CreateAPIView):
         # Email client
         send_notification(
             "Demande de rendez-vous reçue",
-            f"Bonjour {appointment.name},\nVotre demande est en attente de confirmation.",
+            f"Bonjour {appointment.name},\nVotre demande est en attente de confirmation. vous recevrer un mail pour confirmation ou refus",
             appointment.email
         )
 
@@ -51,13 +51,13 @@ class AppointmentAdminAPIView(generics.ListAPIView, generics.UpdateAPIView):
 
             send_notification(
                 "Rendez-vous confirmé",
-                f"Bonjour {appointment.name},\nVotre rendez-vous est confirmé.",
+                f"Bonjour {appointment.name},\nVotre rendez-vous est confirmé, vous recevrerz un lien google meet pour la conference",
                 appointment.email
             )
 
         elif new_status == "rejected":
             send_notification(
                 "Rendez-vous refusé",
-                f"Bonjour {appointment.name},\nVotre rendez-vous a été refusé.",
+                f"Bonjour {appointment.name},\nVotre rendez-vous a été refusé.Refaite un autre demande de stage",
                 appointment.email
             )
