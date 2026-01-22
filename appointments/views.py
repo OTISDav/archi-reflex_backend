@@ -6,30 +6,6 @@ from core.emails import send_notification
 from django.conf import settings
 
 
-class AppointmentCreateAPIView(generics.CreateAPIView):
-
-    queryset = Appointment.objects.all()
-    serializer_class = PublicAppointmentSerializer
-    permission_classes = []
-
-    def perform_create(self, serializer):
-        appointment = serializer.save(status="pending")
-
-        # Email client
-        send_notification(
-            "Demande de rendez-vous reçue",
-            f"Bonjour {appointment.name},\nVotre demande est en attente de confirmation. vous recevrer un mail apres confirmation ou refus",
-            appointment.email
-        )
-
-        # Email admin
-        send_notification(
-            "Nouveau rendez-vous en attente",
-            f"{appointment.name} - {appointment.email} - {appointment.phone}",
-            settings.ADMIN_EMAIL
-        )
-
-
 class AppointmentAdminAPIView(generics.ListAPIView, generics.UpdateAPIView):
     queryset = Appointment.objects.all()
     serializer_class = AdminAppointmentSerializer
@@ -37,7 +13,7 @@ class AppointmentAdminAPIView(generics.ListAPIView, generics.UpdateAPIView):
     lookup_field = "pk"
 
     def perform_update(self, serializer):
-        appointment = serializer.save()
+        appointment = serializer.save()  # 🔹 Save met à jour directement
 
         new_status = serializer.validated_data.get("status")
 
