@@ -4,10 +4,8 @@ from django.conf import settings
 from datetime import datetime, timedelta
 
 def create_calendar_event(appointment):
-    """
-    Crée un événement Google Calendar pour un rendez-vous.
-    """
-    # 🔑 Service Account JSON sur Render
+
+
     credentials = service_account.Credentials.from_service_account_file(
         "/etc/secrets/service_account.json",
         scopes=['https://www.googleapis.com/auth/calendar']
@@ -15,9 +13,8 @@ def create_calendar_event(appointment):
 
     service = build('calendar', 'v3', credentials=credentials)
 
-    # 🔹 Convertir date + time en datetime
     start_dt = datetime.combine(appointment.date, appointment.time)
-    end_dt = start_dt + timedelta(hours=1)  # Durée 1 heure
+    end_dt = start_dt + timedelta(hours=1)
 
     start_iso = start_dt.isoformat()
     end_iso = end_dt.isoformat()

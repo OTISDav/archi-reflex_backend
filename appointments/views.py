@@ -7,9 +7,7 @@ from django.conf import settings
 
 
 class AppointmentCreateAPIView(generics.CreateAPIView):
-    """
-    API publique : création d'un rendez-vous (status = pending)
-    """
+
     queryset = Appointment.objects.all()
     serializer_class = PublicAppointmentSerializer
     permission_classes = []
@@ -21,13 +19,16 @@ class AppointmentCreateAPIView(generics.CreateAPIView):
         send_notification(
             "Demande de rendez-vous reçue",
             f"Bonjour {appointment.name},\nVotre demande est en attente de confirmation.",
+            "vous recevrer un mail apres confirmation ou refus",
             appointment.email
         )
 
         # Email admin
         send_notification(
             "Nouveau rendez-vous en attente",
-            f"{appointment.name} - {appointment.email} - {appointment.phone}",
+            f"{appointment.name} - {appointment.email}",
+            f"{appointment.phone} - {appointment.project_type}",
+            f"{appointment.date} - {appointment.time}",
             settings.ADMIN_EMAIL
         )
 
@@ -39,7 +40,7 @@ class AppointmentAdminAPIView(generics.ListAPIView, generics.UpdateAPIView):
     lookup_field = "pk"
 
     def perform_update(self, serializer):
-        appointment = serializer.save()  # 🔹 Save met à jour directement
+        appointment = serializer.save()
 
         new_status = serializer.validated_data.get("status")
 

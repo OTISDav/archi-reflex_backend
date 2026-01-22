@@ -29,6 +29,7 @@ def mark_confirmed(modeladmin, request, queryset):
         send_notification(
             "Rendez-vous confirmé",
             f"Bonjour {appointment.name},\nVotre rendez-vous est confirmé.",
+            f"Vous recevrez un lien google meet provenant de : .....",
             appointment.email
         )
 
@@ -46,6 +47,7 @@ def mark_rejected(modeladmin, request, queryset):
         send_notification(
             "Rendez-vous refusé",
             f"Bonjour {appointment.name},\nVotre rendez-vous a été refusé.",
+            "veillez choisir un autre chreno",
             appointment.email
         )
 
