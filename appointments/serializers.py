@@ -35,7 +35,19 @@ class PublicAppointmentSerializer(serializers.ModelSerializer):
 class AdminAppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
-        fields = ("id", "status")  # id inclus pour React
+        fields = (
+            "id",
+            "name",
+            "email",
+            "phone",
+            "project_type",
+            "message",
+            "date",
+            "time",
+            "status",
+            "created_at",
+        )
+        # fields = ("id", "status")  # id inclus pour React
 
     def validate_status(self, value):
         # ✅ Statut valide uniquement
