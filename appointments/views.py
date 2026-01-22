@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from .models import Appointment
-from .serializers import PublicAppointmentSerializer, AdminAppointmentSerializer
+from .serializers import AppointmentSerializer
 from core.google_calendar import create_calendar_event
 from core.emails import send_notification
 from django.conf import settings
@@ -11,34 +11,34 @@ class AppointmentCreateAPIView(generics.CreateAPIView):
     API publique : le client crée un RDV → status = pending
     """
     queryset = Appointment.objects.all()
-    serializer_class = PublicAppointmentSerializer
+    serializer_class = AppointmentSerializer
     permission_classes = []  # ouvert au public
 
     def perform_create(self, serializer):
         appointment = serializer.save(status="pending")
 
-        # Email client et admin
+        # Email client
         try:
             send_notification(
                 "Confirmation de réception du rendez-vous",
                 f"Bonjour {appointment.name},\nVotre RDV pour '{appointment.project_type}' a bien été enregistré et est en attente de confirmation.",
                 appointment.email
             )
+            # Email admin
             send_notification(
                 "Nouveau rendez-vous",
                 f"Nouveau RDV avec {appointment.name} ({appointment.email}, {appointment.phone})",
                 settings.ADMIN_EMAIL
             )
         except Exception as e:
-            import logging
-            logging.error(f"Erreur envoi email: {e}")
+            print(f"Erreur envoi email: {e}")
 
 class AppointmentAdminAPIView(generics.GenericAPIView):
     """
     API admin : consulter et mettre à jour le statut d'un RDV
     """
     queryset = Appointment.objects.all()
-    serializer_class = AdminAppointmentSerializer
+    serializer_class = AppointmentSerializer
     permission_classes = [permissions.IsAdminUser]
     lookup_field = "pk"
 
@@ -74,8 +74,7 @@ class AppointmentAdminAPIView(generics.GenericAPIView):
                         appointment.google_event_id = event_id
                         appointment.save()
                     except Exception as e:
-                        import logging
-                        logging.error(f"Erreur Google Calendar: {e}")
+                        print(f"Erreur Google Calendar: {e}")
 
                     # Email confirmation client
                     send_notification(
@@ -92,7 +91,6 @@ class AppointmentAdminAPIView(generics.GenericAPIView):
                         appointment.email
                     )
             except Exception as e:
-                import logging
-                logging.error(f"Erreur envoi email notification status: {e}")
+                print(f"Erreur envoi email notification status: {e}")
 
         return Response(serializer.data, status=status.HTTP_200_OK)
