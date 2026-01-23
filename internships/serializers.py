@@ -12,24 +12,27 @@ class InternshipSerializer(serializers.ModelSerializer):
 
     def get_cv(self, obj):
         if obj.cv:
-            if isinstance(obj.cv, str):
-                return obj.cv
-            return obj.cv.url
+            url = obj.cv.url if hasattr(obj.cv, 'url') else obj.cv
+            # Forcer l'extension PDF si absente
+            if not url.lower().endswith(('.pdf', '.doc', '.docx')):
+                url += '.pdf'
+            return url
         return None
 
     def get_letter(self, obj):
         if obj.letter:
-            if isinstance(obj.letter, str):
-                return obj.letter
-            return obj.letter.url
+            url = obj.letter.url if hasattr(obj.letter, 'url') else obj.letter
+            if not url.lower().endswith(('.pdf', '.doc', '.docx')):
+                url += '.pdf'
+            return url
         return None
 
     def validate_cv(self, file):
-        if not file.name.endswith('.pdf'):
+        if not file.name.lower().endswith('.pdf'):
             raise serializers.ValidationError("Le CV doit être en PDF.")
         return file
 
     def validate_letter(self, file):
-        if not file.name.endswith('.pdf'):
+        if not file.name.lower().endswith('.pdf'):
             raise serializers.ValidationError("La lettre doit être en PDF.")
         return file
