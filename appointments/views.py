@@ -51,7 +51,7 @@ class AppointmentAdminAPIView(generics.ListAPIView, generics.UpdateAPIView):
 
             send_notification(
                 "Rendez-vous confirmé",
-                f"Bonjour {appointment.name},\nVotre rendez-vous est confirmé, vous recevrer un lien pour la conference gogle meet",
+                f"Bonjour {appointment.name},\nVotre rendez-vous est confirmé donc vous recevrer un lien pour la conference gogle meet",
                 appointment.email
             )
 

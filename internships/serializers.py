@@ -12,10 +12,8 @@ class InternshipSerializer(serializers.ModelSerializer):
 
     def get_cv(self, obj):
         if obj.cv:
-            # si c'est déjà une string (upload via perform_create), on renvoie tel quel
             if isinstance(obj.cv, str):
                 return obj.cv
-            # sinon CloudinaryField
             return obj.cv.url
         return None
 

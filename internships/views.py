@@ -32,7 +32,7 @@ class InternshipCreateAPIView(APIView):
         cv_result = upload(cv, resource_type="raw", public_id=f"internships/cv/{int(time.time())}_{cv.name}")
         letter_result = upload(letter, resource_type="raw", public_id=f"internships/letters/{int(time.time())}_{letter.name}")
 
-        # Création de l'objet Internship
+
         serializer = InternshipSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         internship = serializer.save(
@@ -40,16 +40,16 @@ class InternshipCreateAPIView(APIView):
             letter=letter_result.get("secure_url")
         )
 
-        # Emails
+
         try:
             send_notification(
                 "Confirmation de candidature",
-                f"Bonjour {internship.name},\nVotre demande de stage a bien été enregistrée.",
+                f"Bonjour {internship.name},\nVotre demande de stage a bien été enregistrée. Vous serez notifie apres etude",
                 internship.email
             )
             send_notification(
                 "Nouvelle demande de stage",
-                f"{internship.name} ({internship.email}, {internship.phone}) a postulé",
+                f"{internship.name} ({internship.email}, {internship.phone}) a postulé. Allez dans votre Dashboard Admin pour consulter",
                 settings.ADMIN_EMAIL
             )
         except Exception as e:
