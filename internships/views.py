@@ -7,11 +7,9 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .models import Internship
 from .serializers import InternshipSerializer
-
 import time
 
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 Mo max par fichier
-
 from core.emails import send_notification
 
 class InternshipCreateAPIView(APIView):
@@ -28,11 +26,21 @@ class InternshipCreateAPIView(APIView):
         if letter.size > MAX_FILE_SIZE:
             return Response({"letter": "La lettre est trop volumineuse (max 10 Mo)."}, status=400)
 
-        # Upload Cloudinary
-        cv_result = upload(cv, resource_type="raw", public_id=f"internships/cv/{int(time.time())}_{cv.name}")
-        letter_result = upload(letter, resource_type="raw", public_id=f"internships/letters/{int(time.time())}_{letter.name}")
+        # Upload Cloudinary avec preset public "raw_public"
+        cv_result = upload(
+            cv,
+            resource_type="raw",
+            upload_preset="raw_public",
+            public_id=f"internships/cv/{int(time.time())}_{cv.name}"
+        )
+        letter_result = upload(
+            letter,
+            resource_type="raw",
+            upload_preset="raw_public",
+            public_id=f"internships/letters/{int(time.time())}_{letter.name}"
+        )
 
-
+        # Sauvegarde en base
         serializer = InternshipSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         internship = serializer.save(
@@ -40,16 +48,16 @@ class InternshipCreateAPIView(APIView):
             letter=letter_result.get("secure_url")
         )
 
-
+        # Envoi notifications
         try:
             send_notification(
                 "Confirmation de candidature",
-                f"Bonjour {internship.name},\nVotre demande de stage a bien été enregistrée. Vous serez notifie apres etude",
+                f"Bonjour {internship.name},\nVotre demande de stage a bien été enregistrée. Vous serez notifié après étude.",
                 internship.email
             )
             send_notification(
                 "Nouvelle demande de stage",
-                f"{internship.name} ({internship.email}, {internship.phone}) a postulé. Allez dans votre Dashboard Admin pour consulter",
+                f"{internship.name} ({internship.email}, {internship.phone}) a postulé. Allez dans votre Dashboard Admin pour consulter.",
                 settings.ADMIN_EMAIL
             )
         except Exception as e:
@@ -58,12 +66,7 @@ class InternshipCreateAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-
-
-
-
 class InternshipAdminAPIView(generics.GenericAPIView):
-
     queryset = Internship.objects.all().order_by("-created_at")
     serializer_class = InternshipSerializer
     permission_classes = [permissions.IsAdminUser]
