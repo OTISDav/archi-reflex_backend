@@ -18,7 +18,7 @@ class AppointmentCreateAPIView(generics.CreateAPIView):
         # Email client
         send_notification(
             "Demande de rendez-vous reçue",
-            f"Bonjour {appointment.name},\nVotre demande est en attente de confirmation.",
+            f"Bonjour {appointment.name},\nVotre demande est en attente de confirmation.vous recevrer un mail de confirmation et se refus",
             appointment.email
         )
 
@@ -37,7 +37,7 @@ class AppointmentAdminAPIView(generics.ListAPIView, generics.UpdateAPIView):
     lookup_field = "pk"
 
     def perform_update(self, serializer):
-        appointment = serializer.save()  # 🔹 Save met à jour directement
+        appointment = serializer.save()
 
         new_status = serializer.validated_data.get("status")
 
@@ -51,13 +51,13 @@ class AppointmentAdminAPIView(generics.ListAPIView, generics.UpdateAPIView):
 
             send_notification(
                 "Rendez-vous confirmé",
-                f"Bonjour {appointment.name},\nVotre rendez-vous est confirmé",
+                f"Bonjour {appointment.name},\nVotre rendez-vous est confirmé, vous recevrer un lien pour la conference gogle meet",
                 appointment.email
             )
 
         elif new_status == "rejected":
             send_notification(
                 "Rendez-vous refusé",
-                f"Bonjour {appointment.name},\nVotre rendez-vous a été refusé.",
+                f"Bonjour {appointment.name},\nVotre rendez-vous a été refusé. veillez refaire une autre prise de rdv",
                 appointment.email
             )
