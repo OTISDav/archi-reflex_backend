@@ -150,7 +150,7 @@ REST_FRAMEWORK = {
 # EMAIL_HOST_USER = 'ddavidotis@gmail.com'
 # EMAIL_HOST_PASSWORD = 'mxbx koce zrro gqsr'
 # DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-# ADMIN_EMAIL = 'davidbotcholi2003@gmail.com'
+ADMIN_EMAIL = 'ddavidotis@gmail.com'
 
 
 
