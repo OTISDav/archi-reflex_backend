@@ -1,5 +1,7 @@
 from pathlib import Path
 import dj_database_url
+from datetime import timedelta
+
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -7,7 +9,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-#3dl(x&0e^=56o#g3%i95l7da^p6=ig7mi%rev4s+ea%ztt^(b"
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = [
@@ -35,15 +36,11 @@ INSTALLED_APPS = [
 
     'rest_framework',
 
-
-
-
     'appointments',
     'internships',
     'projects',
     'contacts',
     'core',
-
 
     'cloudinary',
     'cloudinary_storage',
@@ -107,27 +104,7 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 WSGI_APPLICATION = "archibackend.wsgi.application"
 
 
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'neondb',
-#         'USER': 'neon_user',
-#         'PASSWORD': 'password',
-#         'HOST': 'ep-xxxx.neon.tech',
-#         'PORT': '5432',
-#         'OPTIONS': {'sslmode': 'require'}
-#     }
-# }
 
 DATABASES = {
     'default': dj_database_url.config(
@@ -143,13 +120,7 @@ REST_FRAMEWORK = {
 }
 
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'ddavidotis@gmail.com'
-# EMAIL_HOST_PASSWORD = 'mxbx koce zrro gqsr'
-# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 ADMIN_EMAIL = 'ddavidotis@gmail.com'
 
 
@@ -157,6 +128,15 @@ ADMIN_EMAIL = 'ddavidotis@gmail.com'
 GOOGLE_CREDENTIALS_FILE = BASE_DIR / 'service_account.json'
 GOOGLE_TIMEZONE = 'Africa/Lome'
 GOOGLE_CALENDAR_ID = "a8e12f026d3d4bfed797fba69c09570966733beafe92f662490bb4b62de7644b@group.calendar.google.com"
+
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=30*6),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30*6),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+}
 
 
 
