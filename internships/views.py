@@ -86,3 +86,8 @@ class InternshipAdminAPIView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+    def delete(self, request, pk):
+        internship = get_object_or_404(Internship, pk=pk)
+        internship.delete()
+        return Response({"detail": "Internship deleted successfully."}, status=204)
