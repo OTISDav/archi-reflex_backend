@@ -7,7 +7,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-SECRET_KEY = "django-insecure-#3dl(x&0e^=56o#g3%i95l7da^p6=ig7mi%rev4s+ea%ztt^(b"
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 DEBUG = False
 
@@ -46,12 +46,24 @@ INSTALLED_APPS = [
 ]
 
 
-CORS_ALLOW_ALL_ORIGINS = True
+
+SECURE_SSL_REDIRECT = True
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
+    "https://archi-reflex-front-site.vercel.app",
+    "https://archi-reflex-front-admin.vercel.app",
     "https://archi-reflex-frontend.onrender.com",
 ]
+
+
 
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
@@ -104,13 +116,10 @@ WSGI_APPLICATION = "archibackend.wsgi.application"
 
 
 
-
 DATABASES = {
-    'default': dj_database_url.config(
-        default='postgresql://neondb_owner:npg_sz3jYTA7rnQw@ep-icy-pond-abc344xt-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require',
-        conn_max_age=600
-    )
+    'default': dj_database_url.config(conn_max_age=600)
 }
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
