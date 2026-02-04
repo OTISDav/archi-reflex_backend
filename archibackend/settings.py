@@ -1,7 +1,7 @@
 from pathlib import Path
 import dj_database_url
 from datetime import timedelta
-
+import os
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-#3dl(x&0e^=56o#g3%i95l7da^p6=ig7mi%rev4s+ea%ztt^(b"
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     "archi-reflex-backend.onrender.com",
@@ -19,7 +19,6 @@ ALLOWED_HOSTS = [
 
 
 
-# Application definition
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -89,7 +88,7 @@ TEMPLATES = [
     },
 ]
 
-import os
+
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv("CLOUDINARY_CLOUD_NAME"),
@@ -138,10 +137,6 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': False,
 }
 
-
-
-# Password validation
-# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
