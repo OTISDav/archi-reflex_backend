@@ -55,6 +55,13 @@ SESSION_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://archi-reflex-front-site.vercel.app",
+    "https://archi-reflex-front-admin.vercel.app",
+]
+
+
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
