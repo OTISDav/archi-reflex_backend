@@ -143,7 +143,7 @@ REST_FRAMEWORK = {
 
 
 
-ADMIN_EMAIL = 'botcholi.essofa@gmail.com'
+ADMIN_EMAIL = 'eboctholi@archi-reflex.com'
 
 
 
