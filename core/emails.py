@@ -1,8 +1,8 @@
 import os
 import requests
 
-DEFAULT_SENDER = {"name": "OTISDav", "email": "david.botcholi@davidbotcholi.online"}
-ADMIN_EMAIL = 'ddavidotis@gmail.com'
+DEFAULT_SENDER = {"name": "ARCHI-REFLEX", "email": "contact@archi-reflex.com"}
+ADMIN_EMAIL = 'botcholi.essofa@gmail.com'
 
 def send_notification(subject, message, recipient):
 
