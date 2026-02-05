@@ -13,8 +13,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = [
     "archi-reflex-backend.onrender.com",
-    "https://archi-reflex.com"
-    "https://admin.archi-reflex.com"
+    "https://archi-reflex.com",
+    "https://admin.archi-reflex.com",
     "localhost",
     "127.0.0.1",
 ]
@@ -60,9 +60,11 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CSRF_TRUSTED_ORIGINS = [
     "https://archi-reflex-front-site.vercel.app",
     "https://archi-reflex-front-admin.vercel.app",
-    "https://archi-reflex.com"
-    "https://admin.archi-reflex.com"
+    "https://archi-reflex.com",
+    "https://admin.archi-reflex.com",
 ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 
 
@@ -72,8 +74,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://archi-reflex-front-site.vercel.app",
     "https://archi-reflex-front-admin.vercel.app",
     "https://archi-reflex-frontend.onrender.com",
-    "https://archi-reflex.com"
-    "https://admin.archi-reflex.com"
+    "https://archi-reflex.com",
+    "https://admin.archi-reflex.com",
 ]
 
 
@@ -85,7 +87,6 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -181,7 +182,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Africa/Lome"
+
 
 USE_I18N = True
 
