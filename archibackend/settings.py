@@ -13,6 +13,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = [
     "archi-reflex-backend.onrender.com",
+    "https://archi-reflex.com"
+    "https://admin.archi-reflex.com"
     "localhost",
     "127.0.0.1",
 ]
@@ -58,6 +60,8 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CSRF_TRUSTED_ORIGINS = [
     "https://archi-reflex-front-site.vercel.app",
     "https://archi-reflex-front-admin.vercel.app",
+    "https://archi-reflex.com"
+    "https://admin.archi-reflex.com"
 ]
 
 
@@ -68,6 +72,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://archi-reflex-front-site.vercel.app",
     "https://archi-reflex-front-admin.vercel.app",
     "https://archi-reflex-frontend.onrender.com",
+    "https://archi-reflex.com"
+    "https://admin.archi-reflex.com"
 ]
 
 
@@ -136,7 +142,7 @@ REST_FRAMEWORK = {
 
 
 
-ADMIN_EMAIL = 'ddavidotis@gmail.com'
+ADMIN_EMAIL = 'botcholi.essofa@gmail.com'
 
 
 
